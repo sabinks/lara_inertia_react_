@@ -18,6 +18,7 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::get('/email/verify/{id}/{verification_token}', [VerificationController::class, 'email_verification']);
 Route::post('next/book-appointment', [NextBookAppointmentController::class, 'store']);
 Route::get('next/book-appointment-slot-available', [NextBookAppointmentController::class, 'bookAppointmentSlotAvailable']);
+Route::get('next/check-appointment-availablity', [NextBookAppointmentController::class, 'checkAppointmentAvailability']);
 
 Route::group([], function () {
     Route::post('get-user', [AuthController::class, 'getUser'])->middleware(['auth:api']);

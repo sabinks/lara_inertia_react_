@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Next;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\BookAppointment;
+use App\Jobs\BookAppointmentJob;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
@@ -27,17 +29,21 @@ class BookAppointmentController extends Controller
             'email' => 'required|lowercase|email',
             'phone' => 'required',
             'dob' => 'required',
-            'booking_date_time' => 'required',
-            'description' => 'required|max:255'
+            'booking_date' => 'required',
+            'booking_time' => 'required',
+            'description' => 'required|max:500'
         ]);
         if ($validator->fails()) {
             return response($validator->errors(), 422);
         }
-        $input = $request->only(['name', 'email', 'phone', 'dob', 'booking_date_time', 'description']);
+        $input = $request->only(['name', 'email', 'phone', 'dob', 'description']);
+        $input['booking_date_time'] = $request->booking_date . " " . $request->booking_time;
         $BookAppointment = BookAppointment::create($input);
 
+        // BookAppointmentJob::dispatch($BookAppointment);
+
         return response()->json([
-            'message' => 'Appointment saved, we will send mail shortly!',
+            'message' => 'Thank you for booking appointment with us, we will contact you soon!',
         ], 200);
     }
 
@@ -63,5 +69,10 @@ class BookAppointmentController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+    public function checkAppointmentAvailability()
+    {
+        $bookAppointment = BookAppointment::where('booking_date_time', '>=', Carbon::now()->toDateTimeString())->get()->pluck(['booking_date_time']);
+        return $bookAppointment;
     }
 }
