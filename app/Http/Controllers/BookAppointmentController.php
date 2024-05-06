@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Helper;
-use App\Models\BookAppointment;
 use Illuminate\Http\Request;
+use App\Models\BookAppointment;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
+use App\Mail\BookAppointmentStatusChangeMail;
 
 class BookAppointmentController extends Controller
 {
@@ -140,6 +142,12 @@ class BookAppointmentController extends Controller
         }
         $appointment->status = $request->status;
         $appointment->update();
+        if (in_array($appointment->status, ['Confirmed', 'Cancelled'])) {
+            Mail::to($appointment->email)->later(
+                now(),
+                new BookAppointmentStatusChangeMail($appointment)
+            );
+        }
 
         return response()->json([
             'message' => 'Book appointment status updated!',

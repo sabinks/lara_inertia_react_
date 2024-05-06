@@ -6,6 +6,7 @@ use App\Http\Controllers\User\AuthController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\User\RegisterController;
 use App\Http\Controllers\BookAppointmentController;
+use App\Http\Controllers\Next\FormSendMailController;
 use App\Http\Controllers\User\VerificationController;
 use App\Http\Controllers\Next\BookAppointmentController as NextBookAppointmentController;
 
@@ -19,6 +20,8 @@ Route::get('/email/verify/{id}/{verification_token}', [VerificationController::c
 Route::post('next/book-appointment', [NextBookAppointmentController::class, 'store']);
 Route::get('next/book-appointment-slot-available', [NextBookAppointmentController::class, 'bookAppointmentSlotAvailable']);
 Route::get('next/check-appointment-availablity', [NextBookAppointmentController::class, 'checkAppointmentAvailability']);
+Route::post('next/contact-form-send-mail', [FormSendMailController::class, 'contactFormSendMail']);
+
 
 Route::group([], function () {
     Route::post('get-user', [AuthController::class, 'getUser'])->middleware(['auth:api']);
