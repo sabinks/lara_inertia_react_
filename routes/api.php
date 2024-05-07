@@ -6,6 +6,8 @@ use App\Http\Controllers\User\AuthController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\User\RegisterController;
 use App\Http\Controllers\BookAppointmentController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\Next\FormSendMailController;
 use App\Http\Controllers\User\VerificationController;
 use App\Http\Controllers\Next\BookAppointmentController as NextBookAppointmentController;
@@ -37,4 +39,10 @@ Route::group([], function () {
 
     Route::resource('book-appointment', BookAppointmentController::class);
     Route::post('book-appointment/{id}/status', [BookAppointmentController::class, 'statusChange']);
+
+    Route::resource('newsletter', NewsletterController::class);
+    Route::post('send-newsletter', [NewsletterController::class, 'sendNewsletter']);
+    Route::get('client-list', [NewsletterController::class, 'clientList']);
+    Route::resource('clients', ClientController::class);
+    Route::post('/user-status-change/{id}', [UserController::class, 'userActiveStatusChange']);
 });

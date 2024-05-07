@@ -5,15 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class BookAppointment extends Model
+class Newsletter extends Model
 {
     use HasFactory;
-
-    protected $fillable = ['user_id', 'name', 'email', 'phone', 'dob', 'booking_date_time', 'description', 'status'];
+    protected $fillable = ['name', 'content'];
 
     protected $casts = [
-        // 'appointment_date_time' => 'datetime:d/m/Y',
-        // 'dob' => 'datetime:d/m/Y',
         'created_at' => 'datetime:d/m/Y',
         'updated_at' => 'datetime:d/m/Y',
     ];

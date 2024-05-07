@@ -3,10 +3,15 @@
 namespace App\Http\Controllers\Next;
 
 use Carbon\Carbon;
+use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\BookAppointment;
 use App\Jobs\BookAppointmentJob;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class BookAppointmentController extends Controller
@@ -36,15 +41,40 @@ class BookAppointmentController extends Controller
         if ($validator->fails()) {
             return response($validator->errors(), 422);
         }
-        $input = $request->only(['name', 'email', 'phone', 'dob', 'description']);
-        $input['booking_date_time'] = $request->booking_date . " " . $request->booking_time;
-        $BookAppointment = BookAppointment::create($input);
+        DB::beginTransaction();
+        try {
+            $input = $request->only(['name', 'email', 'phone', 'dob', 'description']);
+            $input['booking_date_time'] = $request->booking_date . " " . $request->booking_time;
+            $random_password = Str::random(12);
+            $client = User::whereEmail($request->email)->count();
+            if (!$client) {
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'dob' => $request->dob,
+                    'phone' => $request->phone,
+                    'self_signup' => false,
+                    'admin_added' => false,
+                    'password' => Hash::make($random_password),
+                ]);
+                $input['user_id'] = $user->id;
+                $user->assignRole('Client');
+            } else {
+                $input['user_id'] = $client['id'];
+            }
+            $BookAppointment = BookAppointment::create($input);
+            // BookAppointmentJob::dispatch($BookAppointment);
 
-        // BookAppointmentJob::dispatch($BookAppointment);
-
-        return response()->json([
-            'message' => 'Thank you for booking appointment with us, we will contact you soon!',
-        ], 200);
+            DB::commit();
+            return response()->json([
+                'message' => 'Thank you for booking appointment with us, we will contact you soon!',
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        } catch (\Throwable $th) {
+            DB::rollback();
+        }
     }
 
     /**

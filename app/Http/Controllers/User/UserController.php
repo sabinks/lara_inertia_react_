@@ -23,8 +23,8 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
-        $this->middleware(['role:Super Admin|Admin|Partner'], ['only' => ['userActiveStatusChange', 'userActiveStatusChange']]);
-        $this->middleware(['role:Super Admin|Admin|Partner'], ['only' => 'userProfile']);
+        // $this->middleware(['role:Superadmin'], ['only' => ['userActiveStatusChange', 'userActiveStatusChange']]);
+        // $this->middleware(['role:Superadmin'], ['only' => 'userProfile']);
     }
     /**
      * Display a listing of the resource.
@@ -184,5 +184,28 @@ class UserController extends Controller
         } catch (\Throwable $th) {
             DB::rollback();
         }
+    }
+    public function userActiveStatusChange(Request $request, $id)
+    {
+        $rule = [
+            'status' => 'required'
+        ];
+        $validator = Validator::make($request->all(), $rule);
+        if ($validator->fails()) {
+            return response($validator->errors(), 422);
+        }
+        $status = $request->input('status');
+        $user = User::whereId($id)->first();
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found!',
+            ], 404);
+        }
+        $user->is_active = $status;
+        $user->update();
+
+        return response()->json([
+            'message' => 'User status changed!',
+        ], 200);
     }
 }
