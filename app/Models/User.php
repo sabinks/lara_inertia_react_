@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Models\ClientNote;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Support\Facades\Config;
 use Spatie\Permission\Traits\HasRoles;
@@ -67,5 +68,9 @@ class User extends Authenticatable
     public function scopeActive($query)
     {
         return  $query->where('is_active', true);
+    }
+    public function notes($query)
+    {
+        return $query->hasMany(ClientNote::class);
     }
 }
