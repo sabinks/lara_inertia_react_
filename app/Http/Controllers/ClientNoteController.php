@@ -19,7 +19,7 @@ class ClientNoteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, $client_id)
     {
         $search = $request->input('search');
         $order_by = $request->has('order_by') ? $request->input('order_by') : 'created_at';
@@ -34,7 +34,7 @@ class ClientNoteController extends Controller
             });
         }
 
-        $query = $query->orderBy($order_by, $order);
+        $query = $query->where('user_id', $client_id)->orderBy($order_by, $order);
         $data =  $query->paginate($pagination);
 
         return response()->json([
