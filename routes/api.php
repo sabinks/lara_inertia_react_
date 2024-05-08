@@ -47,4 +47,6 @@ Route::group([], function () {
     Route::resource('clients', ClientController::class);
     Route::resource('clients/{client_id}/notes', ClientNoteController::class);
     Route::post('/user-status-change/{id}', [UserController::class, 'userActiveStatusChange']);
+    Route::get('user-profile/{id}', [UserController::class, 'userProfile']);    //general
+
 });

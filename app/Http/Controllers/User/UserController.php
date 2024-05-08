@@ -208,4 +208,23 @@ class UserController extends Controller
             'message' => 'User status changed!',
         ], 200);
     }
+
+    public function userProfile($id)
+    {
+        $user = User::whereId($id)->first();
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found!',
+            ], 404);
+        }
+        $roles =  $user->roles->pluck('name')->toArray();
+        if (in_array('Client', $roles)) {
+
+            $user['data'] = User::whereId($id)->with([])->first();
+
+            $user['profile_image_path'] = Config::get('app.url')  . "/storage/profile_image/";
+        }
+
+        return $user;
+    }
 }
